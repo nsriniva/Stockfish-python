@@ -221,6 +221,13 @@ namespace {
 
 } // namespace
 
+void UCI::set_position(Position& pos, const string& strpos) {
+  static StateListPtr states;
+  
+  states = StateListPtr(new std::deque<StateInfo>(1)); // Drop old and create a new one
+  pos.set(strpos, Options["UCI_Chess960"], &states->back(), Threads.main());
+}
+
 
 /// UCI::loop() waits for a command from the stdin, parses it and then calls the appropriate
 /// function. It also intercepts an end-of-file (EOF) indication from the stdin to ensure a

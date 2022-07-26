@@ -63,6 +63,7 @@ struct MoveList {
   explicit MoveList(const Position& pos) : last(generate<T>(pos, moveList)) {}
   const ExtMove* begin() const { return moveList; }
   const ExtMove* end() const { return last; }
+  const ExtMove* item(int i) {return moveList+i;}
   size_t size() const { return last - moveList; }
   bool contains(Move move) const {
     return std::find(begin(), end(), move) != end();
@@ -72,6 +73,7 @@ private:
   ExtMove moveList[MAX_MOVES], *last;
 };
 
+using MoveList_LEGAL = MoveList<LEGAL>;
 } // namespace Stockfish
 
 #endif // #ifndef MOVEGEN_H_INCLUDED

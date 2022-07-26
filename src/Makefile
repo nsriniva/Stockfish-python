@@ -40,9 +40,12 @@ endif
 ### Executable name
 ifeq ($(target_windows),yes)
 	EXE = stockfish.exe
+	DSO = stockfish.dll
 else
 	EXE = stockfish
+	DSO = libstockfish.so
 endif
+
 
 ### Installation dir definitions
 PREFIX = /usr/local
@@ -56,11 +59,14 @@ else
 endif
 
 ### Source and object files
-SRCS = benchmark.cpp bitbase.cpp bitboard.cpp endgame.cpp evaluate.cpp main.cpp \
+LIBSRCS = benchmark.cpp bitbase.cpp bitboard.cpp endgame.cpp evaluate.cpp \
 	material.cpp misc.cpp movegen.cpp movepick.cpp pawns.cpp position.cpp psqt.cpp \
 	search.cpp thread.cpp timeman.cpp tt.cpp uci.cpp ucioption.cpp tune.cpp syzygy/tbprobe.cpp \
 	nnue/evaluate_nnue.cpp nnue/features/half_ka_v2_hm.cpp
 
+SRCS = $(LIBSRCS) main.cpp
+
+LIBOBJS = $(notdir $(LIBSRCS:.cpp=.o))
 OBJS = $(notdir $(SRCS:.cpp=.o))
 
 VPATH = syzygy:nnue:nnue/features
@@ -362,7 +368,7 @@ endif
 ifeq ($(COMP),gcc)
 	comp=gcc
 	CXX=g++
-	CXXFLAGS += -pedantic -Wextra -Wshadow
+	CXXFLAGS += -pedantic -Wextra -Wshadow -fPIC
 
 	ifeq ($(arch),$(filter $(arch),armv7 armv8))
 		ifeq ($(OS),Android)
@@ -868,7 +874,7 @@ default:
 ### Section 5. Private Targets
 ### ==========================================================================
 
-all: $(EXE) .depend
+all: $(EXE) $(DSO) .depend
 
 config-sanity: net
 	@echo ""
@@ -925,6 +931,13 @@ config-sanity: net
 	@test "$(neon)" = "yes" || test "$(neon)" = "no"
 	@test "$(comp)" = "gcc" || test "$(comp)" = "icc" || test "$(comp)" = "mingw" || test "$(comp)" = "clang" \
 	|| test "$(comp)" = "armv7a-linux-androideabi16-clang"  || test "$(comp)" = "aarch64-linux-android21-clang"
+
+
+libstockfish.so: $(LIBOBJS)
+	$(CXX) -o $@ -shared -Wl,-flto -Wl,-soname,$@ $(OBJS) $(LDFLAGS)
+
+stockfish.dll:$(LIBOBJS)
+	$(CXX) -o $@ -shared -Wl,--out-implib,libstockfish.a -Wl,-no-undefined -Wl,--enable-runtime-pseudo-reloc
 
 $(EXE): $(OBJS)
 	+$(CXX) -o $@ $(OBJS) $(LDFLAGS)
