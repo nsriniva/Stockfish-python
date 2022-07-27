@@ -20,7 +20,32 @@ Position = StockfishNS.Position
 MoveList_LEGAL = StockfishNS.MoveList_LEGAL
 
 #Objects
+
+#The default values for the various options are:
+#Clear Hash 0
+#Debug Log File 0
+#EvalFile 0
+#Hash 16
+#Move Overhead 10
+#MultiPV 1
+#nodestime 0
+#Ponder 0
+#Skill Level 20
+#Slow Mover 100
+#Syzygy50MoveRule 1
+#SyzygyPath 0
+#SyzygyProbeDepth 1
+#SyzygyProbeLimit 7
+#Threads 1
+#UCI_AnalyseMode 0
+#UCI_Chess960 0
+#UCI_Elo 1350
+#UCI_LimitStrength 0
+#UCI_ShowWDL 0
+#Use NNUE 1
+#LEGAL Iteration 0
 Options = StockfishNS.Options
+
 Threads = StockfishNS.Threads
 
 class Moves(object):
@@ -53,6 +78,7 @@ class Stockfish(object):
         Position.init()
         Bitbases.init()
         Endgames.init()
+        # The default value for the 'Threads' option is 1.
         Threads.set(int(Options['Threads'].__float__()))
         Search.clear()
         NNUE.init()
