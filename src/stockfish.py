@@ -1,6 +1,6 @@
 import cppyy
 
-cppyy.include('./main.hpp')
+cppyy.include('./stockfish.h')
 cppyy.load_library('./libstockfish.so')
 
 #Namespaces
